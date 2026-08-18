@@ -1,0 +1,55 @@
+import type { Expense } from "../types/expense";
+
+export const mockExpenses: Expense[] = [
+  {
+    id: "1",
+    title: "Groceries",
+    category: "Food & Dining",
+    date: "Aug 16, 2026",
+    paymentMethod: "Debit Card",
+    amount: "Rs. 2,450",
+    hasReceipt: true,
+    notes: "Weekly grocery shopping",
+    lineItems: [
+      { name: "Chicken", qty: 2, unitPrice: 450, total: 900 },
+      { name: "Vegetables", qty: 1, unitPrice: 350, total: 350 },
+      { name: "Milk", qty: 2, unitPrice: 120, total: 240 },
+    ],
+  },
+  {
+    id: "2",
+    title: "Electricity Bill",
+    category: "Utilities",
+    date: "Aug 15, 2026",
+    paymentMethod: "eSewa",
+    amount: "Rs. 1,850",
+    hasReceipt: true,
+  },
+  {
+    id: "3",
+    title: "Uber Ride",
+    category: "Transportation",
+    date: "Aug 14, 2026",
+    paymentMethod: "Credit Card",
+    amount: "Rs. 620",
+    hasReceipt: false,
+  },
+  {
+    id: "4",
+    title: "Coffee",
+    category: "Food & Dining",
+    date: "Aug 14, 2026",
+    paymentMethod: "Cash",
+    amount: "Rs. 180",
+    hasReceipt: false,
+  },
+  {
+    id: "5",
+    title: "Internet Bill",
+    category: "Utilities",
+    date: "Aug 12, 2026",
+    paymentMethod: "eSewa",
+    amount: "Rs. 1,499",
+    hasReceipt: true,
+  },
+];
