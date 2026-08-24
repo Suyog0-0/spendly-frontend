@@ -24,7 +24,7 @@ export const RegisterPage = () => {
           <div className="relative z-10 p-12">
             <h1 className="font-[Newsreader] text-4xl font-semibold tracking-tight text-primary">
               Spendly
-            </h1>
+            </h1>   
             <p className="mt-2 text-sm text-soft-gray">Personal Finance</p>
           </div>
 

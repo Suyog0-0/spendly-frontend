@@ -10,7 +10,7 @@ import { ProfilePage } from "./pages/Profile/ProfilePage";
 import { NotFoundPage } from "./pages/NotFound/NotFoundPage";
 import { ServerErrorPage } from "./pages/ServerError/ServerErrorPage";
 import { RegisterPage } from "./pages/Register/RegisterPage";
-// import { LoginPage } from "./pages/Login/LoginPage";
+import { LoginPage } from "./pages/Login/LoginPage";
 
 function App() {
   return (
@@ -18,7 +18,7 @@ function App() {
       <Routes>
         <Route path="/" element={<DashboardPage />} />
         <Route path="/expenses" element={<ExpensesPage />} />
-        <Route path="/transactions" element={<TransactionsPage />} /> 
+        <Route path="/transactions" element={<TransactionsPage />} />
         <Route path="/budgets" element={<BudgetsPage />} />
         <Route path="/analytics" element={<AnalyticsPage />} />
         <Route path="/settings" element={<SettingsPage />} />
@@ -26,7 +26,7 @@ function App() {
 
         {/* Auth Pages */}
         <Route path="/register" element={<RegisterPage />} />
-        {/* <Route path="/login" element={<LoginPage />} /> */}
+        <Route path="/login" element={<LoginPage />} />
 
         {/* Error Pages */}
         <Route path="/error" element={<ServerErrorPage />} />

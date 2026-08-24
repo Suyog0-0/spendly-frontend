@@ -1,10 +1,11 @@
 // src/pages/ServerError/ServerErrorPage.tsx
 import { Link, useNavigate } from "react-router-dom";
-import { RefreshCw, Mail, ArrowLeft } from "lucide-react";
+import { RefreshCw, ArrowLeft } from "lucide-react";
+// import { Mail} from "lucide-react";
 
 export const ServerErrorPage = () => {
   const navigate = useNavigate();
-    
+
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-obsidian px-6">
       <div className="pointer-events-none absolute left-1/2 top-1/2 h-64 w-64 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/5" />
@@ -14,7 +15,7 @@ export const ServerErrorPage = () => {
         <button
           type="button"
           onClick={() => navigate(-1)}
-          className="group mx-auto inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/3 px-4 py-2 text-sm font-medium text-soft-gray shadow-[0_4px_16px_rgba(0,0,0,0.15)] backdrop-blur-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/30 hover:bg-primary/10 hover:text-primary hover:shadow-[0_6px_20px_rgba(212,175,55,0.12)] focus:outline-none focus:ring-2 focus:ring-primary/40 focus:ring-offset-2 focus:ring-offset-obsidian"
+          className="group mx-auto inline-flex items-center  cursor-pointer gap-2 rounded-full border border-white/10 bg-white/3 px-4 py-2 text-sm font-medium text-soft-gray shadow-[0_4px_16px_rgba(0,0,0,0.15)] backdrop-blur-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/30 hover:bg-primary/10 hover:text-primary hover:shadow-[0_6px_20px_rgba(212,175,55,0.12)] focus:outline-none focus:ring-2 focus:ring-primary/40 focus:ring-offset-2 focus:ring-offset-obsidian"
         >
           <ArrowLeft
             className="h-4 w-4 transition-transform duration-200 group-hover:-translate-x-1"
@@ -31,7 +32,7 @@ export const ServerErrorPage = () => {
           <h2 className="font-[Newsreader] text-2xl font-medium text-on-surface">
             Something Went Wrong
           </h2>
-          <p className="text-sm text-soft-gray">
+          <p className="text-sm text-soft-gray cursor-pointer">
             We hit an unexpected error on our end. Try again, and if it keeps
             happening, let us know.
           </p>
@@ -41,7 +42,7 @@ export const ServerErrorPage = () => {
           <button
             type="button"
             onClick={() => window.location.reload()}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-semibold text-on-primary shadow-[0_8px_24px_rgba(212,175,55,0.25)] transition hover:brightness-110 sm:w-auto"
+            className="inline-flex w-full items-center  cursor-pointer justify-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-semibold text-on-primary shadow-[0_8px_24px_rgba(212,175,55,0.25)] transition hover:brightness-110 sm:w-auto"
           >
             <RefreshCw className="h-4 w-4" strokeWidth={1.75} />
             Try Again
@@ -54,13 +55,13 @@ export const ServerErrorPage = () => {
           </Link>
         </div>
 
-        <a
+        {/* <a
           href="#"
           className="inline-flex items-center justify-center gap-2 text-sm text-soft-gray transition hover:text-primary"
         >
           <Mail className="h-4 w-4" strokeWidth={1.75} />
           Contact Support
-        </a>
+        </a> */}
       </div>
     </div>
   );
