@@ -170,11 +170,11 @@ export const LoginPage = () => {
                   className="ml-1 border-b border-primary-container/30 pb-0.5 text-sm font-semibold text-primary-container transition hover:border-primary hover:text-primary"
                 >
                   Create an account
-                </Link>
+                </Link> 
               </p>
             </div>
           </div>
-        </div>
+        </div>  
       </main>
     </div>
   );
