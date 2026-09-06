@@ -1,5 +1,5 @@
 // src/pages/TransactionsPage.tsx
-import { AppLayout } from "../components/layout/AppLayout";
+import { AppLayout } from "../../../components/layout/AppLayout";
 
 export const TransactionsPage = () => {
   return (

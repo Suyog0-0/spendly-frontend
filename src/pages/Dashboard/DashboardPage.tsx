@@ -1,5 +1,5 @@
 // src/pages/Dashboard/DashboardPage.tsx
-import { AppLayout } from "../components/layout/AppLayout";
+import { AppLayout } from "../../../components/layout/AppLayout";
 
 export const DashboardPage = () => {
   return (

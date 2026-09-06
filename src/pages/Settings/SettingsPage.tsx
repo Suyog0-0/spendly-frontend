@@ -1,5 +1,5 @@
 // src/pages/SettingsPage.tsx
-import { AppLayout } from "../components/layout/AppLayout";
+import { AppLayout } from "../../../components/layout/AppLayout";
 
 export const SettingsPage = () => {
   return (

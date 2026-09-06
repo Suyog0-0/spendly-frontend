@@ -1,4 +1,4 @@
-import { AppLayout } from "../components/layout/AppLayout";
+import { AppLayout } from "../../../components/layout/AppLayout";
 import { mockExpenses } from "../../data/mockExpenses";
 import { ExpenseHeader } from "./components/ExpenseHeader";
 import { ExpenseSummary } from "./components/ExpenseSummary";

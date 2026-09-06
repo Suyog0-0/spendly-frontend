@@ -1,5 +1,5 @@
 // src/pages/Profile/ProfilePage.tsx
-import { AppLayout } from "../components/layout/AppLayout";
+import { AppLayout } from "../../../components/layout/AppLayout";
 
 export const ProfilePage = () => {
   return (

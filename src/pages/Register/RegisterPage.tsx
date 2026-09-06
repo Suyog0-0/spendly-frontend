@@ -1,18 +1,84 @@
 // src/pages/Register/RegisterPage.tsx
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Mail, Lock, User, Eye } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  registerSchema,
+  type RegisterFormData,
+} from "../../schemas/registerSchema";
 
 export const RegisterPage = () => {
+  const navigate = useNavigate();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [serverMessage, setServerMessage] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<RegisterFormData>({
+    resolver: zodResolver(registerSchema),
+  });
+
+  const onSubmit = async (data: RegisterFormData) => {
+    setIsSubmitting(true);
+    setServerMessage(null);
+
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/auth/register`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name: data.name,
+            email: data.email,
+            password: data.password,
+          }),
+        },
+      );
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        setServerMessage({ type: "error", text: result.message });
+        return;
+      }
+
+      setServerMessage({
+        type: "success",
+        text: "Account created! Redirecting to login...",
+      });
+
+      setTimeout(() => {
+        navigate("/login");
+      }, 1500);
+    } catch (err) {
+      setServerMessage({
+        type: "error",
+        text: "Something went wrong. Please try again.",
+      });
+      console.log(err);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-obsidian px-4 font-sans text-on-surface">
-      {/* Ambient background glow */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <div className="absolute -left-1/4 -top-1/4 h-[50vw] w-[50vw] rounded-full bg-surface-high/20 blur-[100px]" />
         <div className="absolute -bottom-1/4 -right-1/4 h-[40vw] w-[40vw] rounded-full bg-surface-container/30 blur-[120px]" />
       </div>
 
-      <main className="z-10 grid h-screen w-full max-w-300px gap-12 md:h-[85vh] md:grid-cols-2">
-        {/* Left column — branding + image */}
+      <main className="z-10 grid h-screen w-full max-w-300 gap-12 md:h-[85vh] md:grid-cols-2">
         <div className="relative hidden flex-col justify-between overflow-hidden rounded-2xl border border-white/10 md:flex">
           <img
             src="https://images.unsplash.com/photo-1550053808-52a75a05955d?w=1200&q=80"
@@ -24,7 +90,7 @@ export const RegisterPage = () => {
           <div className="relative z-10 p-12">
             <h1 className="font-[Newsreader] text-4xl font-semibold tracking-tight text-primary">
               Spendly
-            </h1>   
+            </h1>
             <p className="mt-2 text-sm text-soft-gray">Personal Finance</p>
           </div>
 
@@ -37,9 +103,7 @@ export const RegisterPage = () => {
           </div>
         </div>
 
-        {/* Right column — form */}
         <div className="mx-auto flex h-full w-full max-w-md flex-col items-center justify-center overflow-y-auto px-4 py-8 md:items-start md:px-0">
-          {/* Mobile branding */}
           <div className="mb-8 w-full text-center md:hidden">
             <h1 className="font-[Newsreader] text-3xl font-semibold tracking-tight text-primary">
               Spendly
@@ -57,7 +121,22 @@ export const RegisterPage = () => {
               </p>
             </div>
 
-            <form className="w-full space-y-6">
+            {serverMessage && (
+              <div
+                className={`mb-6 rounded-lg border px-4 py-3 text-sm ${
+                  serverMessage.type === "success"
+                    ? "border-primary/30 bg-primary/10 text-primary"
+                    : "border-red-500/30 bg-red-500/10 text-red-400"
+                }`}
+              >
+                {serverMessage.text}
+              </div>
+            )}
+
+            <form
+              className="w-full space-y-6"
+              onSubmit={handleSubmit(onSubmit)}
+            >
               {/* Full Name */}
               <div className="space-y-2">
                 <label
@@ -75,12 +154,17 @@ export const RegisterPage = () => {
                   </div>
                   <input
                     id="name"
-                    name="name"
                     type="text"
                     placeholder="Ram Sigdel"
+                    {...register("name")}
                     className="block w-full bg-transparent py-3 pl-8 text-sm text-on-surface placeholder:text-surface-high focus:outline-none"
                   />
                 </div>
+                {errors.name && (
+                  <p className="mt-1 text-xs text-red-400">
+                    {errors.name.message}
+                  </p>
+                )}
               </div>
 
               {/* Email */}
@@ -100,12 +184,17 @@ export const RegisterPage = () => {
                   </div>
                   <input
                     id="email"
-                    name="email"
                     type="email"
                     placeholder="you@example.com"
+                    {...register("email")}
                     className="block w-full bg-transparent py-3 pl-8 text-sm text-on-surface placeholder:text-surface-high focus:outline-none"
                   />
                 </div>
+                {errors.email && (
+                  <p className="mt-1 text-xs text-red-400">
+                    {errors.email.message}
+                  </p>
+                )}
               </div>
 
               {/* Password */}
@@ -125,9 +214,9 @@ export const RegisterPage = () => {
                   </div>
                   <input
                     id="password"
-                    name="password"
                     type="password"
                     placeholder="••••••••"
+                    {...register("password")}
                     className="block w-full bg-transparent py-3 pl-8 pr-8 text-sm tracking-[0.2em] text-on-surface placeholder:text-surface-high focus:outline-none"
                   />
                   <button
@@ -138,6 +227,11 @@ export const RegisterPage = () => {
                     <Eye className="h-5 w-5" strokeWidth={1.75} />
                   </button>
                 </div>
+                {errors.password && (
+                  <p className="mt-1 text-xs text-red-400">
+                    {errors.password.message}
+                  </p>
+                )}
               </div>
 
               {/* Confirm Password */}
@@ -157,9 +251,9 @@ export const RegisterPage = () => {
                   </div>
                   <input
                     id="confirmPassword"
-                    name="confirmPassword"
                     type="password"
                     placeholder="••••••••"
+                    {...register("confirmPassword")}
                     className="block w-full bg-transparent py-3 pl-8 pr-8 text-sm tracking-[0.2em] text-on-surface placeholder:text-surface-high focus:outline-none"
                   />
                   <button
@@ -170,6 +264,11 @@ export const RegisterPage = () => {
                     <Eye className="h-5 w-5" strokeWidth={1.75} />
                   </button>
                 </div>
+                {errors.confirmPassword && (
+                  <p className="mt-1 text-xs text-red-400">
+                    {errors.confirmPassword.message}
+                  </p>
+                )}
               </div>
 
               {/* Terms */}
@@ -189,9 +288,10 @@ export const RegisterPage = () => {
               <div className="pt-2">
                 <button
                   type="submit"
-                  className="flex w-full items-center justify-center rounded-md bg-primary-container px-6 py-3 text-sm font-semibold uppercase tracking-wide text-obsidian shadow-[0_0_20px_rgba(212,175,55,0.15)] transition hover:bg-primary hover:shadow-[0_0_30px_rgba(212,175,55,0.25)]"
+                  disabled={isSubmitting}
+                  className="flex w-full items-center justify-center rounded-md bg-primary-container px-6 py-3 text-sm font-semibold uppercase tracking-wide text-obsidian shadow-[0_0_20px_rgba(212,175,55,0.15)] transition hover:bg-primary hover:shadow-[0_0_30px_rgba(212,175,55,0.25)] disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  Create Account
+                  {isSubmitting ? "Creating Account..." : "Create Account"}
                 </button>
               </div>
             </form>
