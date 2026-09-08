@@ -1,7 +1,12 @@
 import type { Expense } from "../../../types/expense";
 import { ExpenseRow } from "./ExpenseRow";
 
-export const ExpenseTable = ({ expenses }: { expenses: Expense[] }) => {
+interface Props {
+  expenses: Expense[];
+  onDeleted: () => void;
+}
+
+export const ExpenseTable = ({ expenses, onDeleted }: Props) => {
   return (
     <div className="hidden overflow-hidden rounded-xl border border-outline-soft bg-surface-low shadow-[0_4px_20px_rgba(0,0,0,0.4)] sm:block">
       <table className="w-full">
@@ -12,12 +17,12 @@ export const ExpenseTable = ({ expenses }: { expenses: Expense[] }) => {
             <th className="px-3 py-3">Payment Method</th>
             <th className="px-3 py-3 text-right">Amount</th>
             <th className="px-3 py-3">Receipt</th>
-            <th className="py-3 pl-3 pr-5" />
+            <th className="py-3 pl-3 pr-5 text-right">View</th>
           </tr>
         </thead>
         <tbody>
           {expenses.map((expense) => (
-            <ExpenseRow key={expense._id} expense={expense} />
+            <ExpenseRow key={expense._id} expense={expense} onDeleted={onDeleted} />
           ))}
         </tbody>
       </table>
