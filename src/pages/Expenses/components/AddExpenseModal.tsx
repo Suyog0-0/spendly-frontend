@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { X, Plus, Trash2, UploadCloud } from "lucide-react";
 import { createExpense } from "@/lib/api";
 import type {
@@ -37,13 +37,30 @@ export const AddExpenseModal = ({
   const [date, setDate] = useState("");
   const [category, setCategory] = useState<ExpenseCategory | "">("");
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod | "">("");
+  // Load budgets from localStorage
+  const [budgets, setBudgets] = useState<Record<string, number>>({});
+  useEffect(() => {
+    const saved = localStorage.getItem("spendly_budgets");
+    if (saved) {
+      try {
+        setBudgets(JSON.parse(saved));
+      } catch (e) {}
+    }
+  }, []);
   const [notes, setNotes] = useState("");
   const [lineItems, setLineItems] = useState<ExpenseLineItem[]>([
-    { name: "", qty: 1, unitPrice: 0 },
+    { name: "", qty: 1, unitPrice: 0, total: 0 },
   ]);
   const [receipt, setReceipt] = useState<File | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, []);
 
   const total = lineItems.reduce(
     (sum, item) => sum + item.qty * item.unitPrice,
@@ -57,7 +74,10 @@ export const AddExpenseModal = ({
   };
 
   const addLineItem = () => {
-    setLineItems((prev) => [...prev, { name: "", qty: 1, unitPrice: 0 }]);
+    setLineItems((prev) => [
+      ...prev,
+      { name: "", qty: 1, unitPrice: 0, total: 0 },
+    ]);
   };
 
   const removeLineItem = (index: number) => {
@@ -108,29 +128,29 @@ export const AddExpenseModal = ({
   };
 
   const inputClass =
-    "mt-1.5 w-full rounded-md border border-[#E3E0D9] bg-white px-3 py-2 text-sm text-[#0F1B2E] placeholder:text-[#4B5768]/60 focus:border-[#0C6B4F] focus:outline-none focus:ring-1 focus:ring-[#0C6B4F]";
-  const labelClass = "text-sm font-medium text-[#0F1B2E]";
+    "mt-1 w-full rounded-md border border-outline-soft bg-surface-high px-3 py-1.5 text-sm text-on-surface placeholder:text-soft-gray/60 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary";
+  const labelClass = "text-sm font-medium text-on-surface";
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0F1B2E]/40 p-4">
-      <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-lg bg-white shadow-xl">
-        <div className="flex items-center justify-between border-b border-[#E3E0D9] px-6 py-4">
-          <h2 className="text-base font-medium text-[#0F1B2E]">Add Expense</h2>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-obsidian/80 backdrop-blur-sm p-4">
+      <div className="w-full max-w-xl rounded-lg bg-surface-high shadow-xl">
+        <div className="flex items-center justify-between border-b border-outline-soft px-5 py-3">
+          <h2 className="text-base font-medium text-on-surface">Add Expense</h2>
           <button
             type="button"
             aria-label="Close"
             onClick={onClose}
-            className="rounded-md p-1.5 text-[#4B5768] hover:bg-[#F8F7F4]"
+            className="rounded-md p-1.5 text-soft-gray hover:bg-surface-container"
           >
             <X className="h-4 w-4" />
           </button>
         </div>
 
-        <div className="space-y-6 px-6 py-5">
+        <div className="space-y-4 px-5 py-4">
           {/* Basic fields */}
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <label className="sm:col-span-2">
-              <span className={labelClass}>Expense Title</span>
+              <span className={labelClass}>Expense Title <span className="text-error">*</span></span>
               <input
                 type="text"
                 value={title}
@@ -141,7 +161,7 @@ export const AddExpenseModal = ({
             </label>
 
             <label>
-              <span className={labelClass}>Date</span>
+              <span className={labelClass}>Date <span className="text-error">*</span></span>
               <input
                 type="date"
                 value={date}
@@ -151,7 +171,7 @@ export const AddExpenseModal = ({
             </label>
 
             <label>
-              <span className={labelClass}>Category</span>
+              <span className={labelClass}>Category <span className="text-error">*</span></span>
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value as ExpenseCategory)}
@@ -166,6 +186,17 @@ export const AddExpenseModal = ({
                   </option>
                 ))}
               </select>
+              {/* Budget hint: shows limit and remaining for selected category */}
+              {category && budgets[category] && (
+                <p className={`mt-1 text-xs font-medium ${
+                  total > budgets[category] ? "text-error" : "text-soft-gray"
+                }`}>
+                  Budget: Rs. {budgets[category].toLocaleString()} &nbsp;·&nbsp;
+                  {total > budgets[category]
+                    ? `Exceeded by Rs. ${(total - budgets[category]).toLocaleString()}`
+                    : `Rs. ${(budgets[category] - total).toLocaleString()} remaining`}
+                </p>
+              )}
             </label>
 
             <label>
@@ -194,7 +225,7 @@ export const AddExpenseModal = ({
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder="Add a note..."
-                rows={3}
+                rows={2}
                 className={inputClass}
               />
             </label>
@@ -202,12 +233,12 @@ export const AddExpenseModal = ({
 
           {/* Line items */}
           <div>
-            <span className={labelClass}>Expense Items</span>
+            <span className={labelClass}>Expense Items <span className="text-error">*</span></span>
 
-            <div className="mt-1.5 overflow-hidden rounded-lg border border-[#E3E0D9]">
+            <div className="mt-1.5 overflow-hidden rounded-lg border border-outline-soft">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-[#E3E0D9] bg-[#F8F7F4] text-left text-xs uppercase tracking-wide text-[#4B5768]">
+                  <tr className="border-b border-outline-soft bg-surface-container text-left text-xs uppercase tracking-wide text-soft-gray">
                     <th className="py-2 pl-3 pr-2 font-medium">Item</th>
                     <th className="px-2 py-2 text-right font-medium">Qty</th>
                     <th className="px-2 py-2 text-right font-medium">
@@ -220,7 +251,7 @@ export const AddExpenseModal = ({
                   {lineItems.map((item, index) => (
                     <tr
                       key={index}
-                      className="border-b border-[#E3E0D9] last:border-0"
+                      className="border-b border-outline-soft last:border-0"
                     >
                       <td className="py-1.5 pl-3 pr-2">
                         <input
@@ -230,7 +261,7 @@ export const AddExpenseModal = ({
                             updateLineItem(index, { name: e.target.value })
                           }
                           placeholder="Item name"
-                          className="w-full rounded border border-transparent bg-transparent px-1 py-1 text-sm focus:border-[#0C6B4F] focus:outline-none"
+                          className="w-full rounded border border-transparent bg-transparent px-1 py-1 text-sm focus:border-primary focus:outline-none"
                         />
                       </td>
                       <td className="px-2 py-1.5">
@@ -243,7 +274,7 @@ export const AddExpenseModal = ({
                               qty: Number(e.target.value),
                             })
                           }
-                          className="w-16 rounded border border-transparent bg-transparent px-1 py-1 text-right text-sm focus:border-[#0C6B4F] focus:outline-none"
+                          className="w-16 rounded border border-transparent bg-transparent px-1 py-1 text-right text-sm focus:border-primary focus:outline-none"
                         />
                       </td>
                       <td className="px-2 py-1.5">
@@ -256,7 +287,7 @@ export const AddExpenseModal = ({
                               unitPrice: Number(e.target.value),
                             })
                           }
-                          className="w-20 rounded border border-transparent bg-transparent px-1 py-1 text-right text-sm focus:border-[#0C6B4F] focus:outline-none"
+                          className="w-20 rounded border border-transparent bg-transparent px-1 py-1 text-right text-sm focus:border-primary focus:outline-none"
                         />
                       </td>
                       <td className="py-1.5 pl-2 pr-3 text-right">
@@ -264,7 +295,7 @@ export const AddExpenseModal = ({
                           type="button"
                           onClick={() => removeLineItem(index)}
                           disabled={lineItems.length === 1}
-                          className="text-[#4B5768] hover:text-red-600 disabled:opacity-30"
+                          className="text-soft-gray hover:text-red-600 disabled:opacity-30"
                         >
                           <Trash2 className="h-3.5 w-3.5" />
                         </button>
@@ -273,25 +304,31 @@ export const AddExpenseModal = ({
                   ))}
                 </tbody>
                 <tfoot>
-                  <tr className="bg-[#F8F7F4]">
+                  <tr className="bg-surface-container">
                     <td
                       colSpan={3}
-                      className="py-2 pl-3 pr-2 text-right text-xs font-medium text-[#4B5768]"
+                      className="py-2 pl-3 pr-2 text-right text-xs font-medium text-soft-gray"
                     >
                       Total
                     </td>
-                    <td className="py-2 pl-2 pr-3 text-right font-[Georgia] text-base tabular-nums text-[#0F1B2E]">
+                    <td className="py-2 pl-2 pr-3 text-right font-[Georgia] text-base tabular-nums text-on-surface">
                       Rs. {total.toLocaleString()}
                     </td>
                   </tr>
                 </tfoot>
+                {/* Budget warning — advisory only, does NOT block saving */}
+                {category && budgets[category] && total > budgets[category] && (
+                  <p className="mt-1 px-3 pb-2 text-xs font-medium text-error">
+                    ⚠ Exceeds budget by Rs. {(total - budgets[category]).toLocaleString()} — you can still save.
+                  </p>
+                )}
               </table>
             </div>
 
             <button
               type="button"
               onClick={addLineItem}
-              className="mt-2 inline-flex items-center gap-1.5 text-sm font-medium text-[#0C6B4F] hover:text-[#0A5B42]"
+              className="mt-2 inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary-container"
             >
               <Plus className="h-3.5 w-3.5" />
               Add another item
@@ -300,19 +337,16 @@ export const AddExpenseModal = ({
 
           {/* Receipt uploader */}
           <div>
-            <span className={labelClass}>Receipt (optional)</span>
-            <label className="mt-1.5 flex cursor-pointer flex-col items-center rounded-lg border border-dashed border-[#E3E0D9] bg-[#F8F7F4] px-6 py-8 text-center hover:bg-[#F1EFE9]">
+            <span className={labelClass}>Receipt</span>
+            <label className="mt-1 flex cursor-pointer flex-col items-center rounded-lg border border-dashed border-outline-soft bg-surface-container px-4 py-4 text-center hover:bg-surface-bright">
               <UploadCloud
-                className="h-6 w-6 text-[#4B5768]"
+                className="h-5 w-5 text-soft-gray"
                 strokeWidth={1.75}
               />
-              <p className="mt-3 text-sm font-medium text-[#0F1B2E]">
+              <p className="mt-2 text-sm font-medium text-on-surface">
                 {receipt ? receipt.name : "Upload your receipt"}
               </p>
-              <p className="mt-0.5 text-xs text-[#4B5768]">Click to browse</p>
-              <p className="mt-2 text-xs text-[#4B5768]/70">
-                JPG, PNG or PDF • Max 5 MB
-              </p>
+              <p className="mt-0.5 text-xs text-soft-gray">Click to browse (JPG, PNG or PDF • Max 5 MB)</p>
               <input
                 type="file"
                 accept="image/*,.pdf"
@@ -325,8 +359,8 @@ export const AddExpenseModal = ({
           {error && <p className="text-sm text-red-500">{error}</p>}
         </div>
 
-        <div className="flex items-center justify-between border-t border-[#E3E0D9] px-6 py-4">
-          <span className="font-[Georgia] text-lg tabular-nums text-[#0F1B2E]">
+        <div className="flex items-center justify-between border-t border-outline-soft px-5 py-3">
+          <span className="font-[Georgia] text-lg tabular-nums text-on-surface">
             Total: Rs. {total.toLocaleString()}
           </span>
           <div className="flex gap-2">
@@ -334,7 +368,7 @@ export const AddExpenseModal = ({
               type="button"
               onClick={onClose}
               disabled={submitting}
-              className="rounded-md border border-[#E3E0D9] px-4 py-2 text-sm font-medium text-[#0F1B2E] hover:bg-[#F8F7F4] disabled:opacity-50"
+              className="rounded-md border border-outline-soft px-4 py-2 text-sm font-medium text-on-surface hover:bg-surface-container disabled:opacity-50"
             >
               Cancel
             </button>
@@ -342,7 +376,7 @@ export const AddExpenseModal = ({
               type="button"
               onClick={handleSubmit}
               disabled={submitting}
-              className="rounded-md bg-[#0C6B4F] px-4 py-2 text-sm font-medium text-white hover:bg-[#0A5B42] disabled:opacity-50"
+              className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-on-primary hover:bg-primary-container disabled:opacity-50"
             >
               {submitting ? "Saving..." : "Add Expense"}
             </button>

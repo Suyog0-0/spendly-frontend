@@ -1,4 +1,4 @@
-import { MoreHorizontal, Paperclip } from "lucide-react";
+import { MoreHorizontal } from "lucide-react";
 import { categoryIcons } from "../../../lib/categoryIcons";
 import type { Expense } from "../../../types/expense";
 
@@ -43,13 +43,6 @@ export const ExpenseCard = ({ expense }: { expense: Expense }) => {
           Rs. {expense.amount.toLocaleString()}
         </span>
       </div>
-
-      {expense.receipt && (
-        <div className="mt-2 flex items-center gap-1 text-xs text-soft-gray">
-          <Paperclip className="h-3.5 w-3.5" />
-          Receipt available
-        </div>
-      )}
     </div>
   );
 };
