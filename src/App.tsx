@@ -6,6 +6,7 @@ import { TransactionsPage } from "./pages/Transactions/TransactionsPage";
 import { BudgetsPage } from "./pages/Budgets/BudgetsPage";
 import { AnalyticsPage } from "./pages/Analytics/AnalyticsPage";
 import { SettingsPage } from "./pages/Settings/SettingsPage";
+import { SecurityPage } from "./pages/Settings/SecurityPage";
 import { ProfilePage } from "./pages/Profile/ProfilePage";
 import { NotFoundPage } from "./pages/NotFound/NotFoundPage";
 import { ServerErrorPage } from "./pages/ServerError/ServerErrorPage";
@@ -62,6 +63,14 @@ function App() {
           element={
             <ProtectedRoute>
               <SettingsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/settings/security"
+          element={
+            <ProtectedRoute>
+              <SecurityPage />
             </ProtectedRoute>
           }
         />
