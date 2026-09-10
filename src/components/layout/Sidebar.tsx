@@ -1,4 +1,5 @@
 // src/components/layout/Sidebar.tsx
+import { useState } from "react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
 import {
   LayoutDashboard,
@@ -9,13 +10,14 @@ import {
   User,
   Plus,
   LogOut,
+  Loader2,
 } from "lucide-react";
+import { useAuth } from "@/lib/AuthContext";
 
 const navItems = [
   { label: "Dashboard", icon: LayoutDashboard, path: "/" },
   { label: "Expenses", icon: Receipt, path: "/expenses" },
   { label: "Budgets", icon: Wallet, path: "/budgets" },
-  { label: "Analytics", icon: BarChart3, path: "/analytics" },
   { label: "Profile", icon: User, path: "/profile" },
   { label: "Settings", icon: Settings, path: "/settings" },
 ];
@@ -23,9 +25,14 @@ const navItems = [
 export const Sidebar = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { logout } = useAuth();
+  const [loggingOut, setLoggingOut] = useState(false);
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
+  const handleLogout = async () => {
+    setLoggingOut(true);
+    // Small delay so user sees the loading state
+    await new Promise((r) => setTimeout(r, 600));
+    logout();
     navigate("/login");
   };
 
@@ -72,6 +79,7 @@ export const Sidebar = () => {
       <div className="flex flex-col gap-1.5">
         <button
           type="button"
+          onClick={() => navigate("/expenses", { state: { addModalOpen: true } })}
           className="flex items-center justify-center gap-2 rounded-lg border border-primary/50 bg-transparent px-4 py-2.5 text-sm font-semibold text-primary transition hover:border-primary hover:bg-primary/10"
         >
           <Plus className="h-4 w-4" strokeWidth={2.25} />
@@ -82,10 +90,15 @@ export const Sidebar = () => {
           <button
             type="button"
             onClick={handleLogout}
-            className="flex items-center gap-3 rounded-lg px-4 py-2 text-left text-sm text-soft-gray transition hover:bg-surface-container hover:text-primary"
+            disabled={loggingOut}
+            className="flex items-center gap-3 rounded-lg px-4 py-2 text-left text-sm text-soft-gray transition hover:bg-surface-container hover:text-primary disabled:opacity-50"
           >
-            <LogOut className="h-4.5 w-4.5" strokeWidth={1.75} />
-            Log Out
+            {loggingOut ? (
+              <Loader2 className="h-4.5 w-4.5 animate-spin" strokeWidth={1.75} />
+            ) : (
+              <LogOut className="h-4.5 w-4.5" strokeWidth={1.75} />
+            )}
+            {loggingOut ? "Logging out..." : "Log Out"}
           </button>
         </div>
       </div>
