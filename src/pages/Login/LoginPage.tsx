@@ -1,12 +1,18 @@
 // src/pages/Login/LoginPage.tsx
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowRight, Eye } from "lucide-react";
+import { ArrowRight, Eye, EyeOff, Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema, type LoginFormData } from "../../schemas/loginSchema";
+import { useAuth } from "@/lib/AuthContext";
 
 export const LoginPage = () => {
   const navigate = useNavigate();
+  const { login } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const [serverError, setServerError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const {
     register,
@@ -17,34 +23,32 @@ export const LoginPage = () => {
   });
 
   const onSubmit = async (data: LoginFormData) => {
+    setLoading(true);
+    setServerError("");
     try {
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/api/auth/login`,
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            email: data.email,
-            password: data.password,
-          }),
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: data.email, password: data.password }),
         },
       );
 
       const result = await response.json();
 
       if (!response.ok) {
-        console.log("Login failed:", result.message);
+        setServerError(result.message || "Invalid email or password.");
         return;
       }
 
-      localStorage.setItem("token", result.token);
-      console.log("Login successful:", result);
-
+      // Save token AND user so AuthContext has the correct email/name
+      login(result.token, result.user);
       navigate("/");
-    } catch (err) {
-      console.log("Network error:", err);
+    } catch {
+      setServerError("Network error. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -75,10 +79,14 @@ export const LoginPage = () => {
             </p>
           </div>
 
-          <form
-            className="flex flex-col gap-5"
-            onSubmit={handleSubmit(onSubmit)}
-          >
+          {/* Server error banner */}
+          {serverError && (
+            <div className="mb-4 rounded-lg border border-error/30 bg-error/10 px-3 py-2.5 text-sm text-error">
+              {serverError}
+            </div>
+          )}
+
+          <form className="flex flex-col gap-5" onSubmit={handleSubmit(onSubmit)}>
             {/* Email */}
             <div>
               <label
@@ -95,9 +103,7 @@ export const LoginPage = () => {
                 className="w-full rounded-lg border border-outline-soft bg-surface-container px-3.5 py-2.5 text-sm text-on-surface placeholder:text-soft-gray/50 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
               />
               {errors.email && (
-                <p className="mt-1 text-xs text-red-400">
-                  {errors.email.message}
-                </p>
+                <p className="mt-1 text-xs text-error">{errors.email.message}</p>
               )}
             </div>
 
@@ -120,23 +126,26 @@ export const LoginPage = () => {
               <div className="relative">
                 <input
                   id="password"
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   placeholder="••••••••"
                   {...register("password")}
                   className="w-full rounded-lg border border-outline-soft bg-surface-container px-3.5 py-2.5 pr-10 text-sm text-on-surface placeholder:text-soft-gray/50 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                 />
                 <button
                   type="button"
-                  aria-label="Show password"
+                  aria-label="Toggle password visibility"
+                  onClick={() => setShowPassword((p) => !p)}
                   className="absolute inset-y-0 right-0 flex items-center pr-3 text-soft-gray transition-colors hover:text-on-surface"
                 >
-                  <Eye className="h-4 w-4" strokeWidth={1.75} />
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4" strokeWidth={1.75} />
+                  ) : (
+                    <Eye className="h-4 w-4" strokeWidth={1.75} />
+                  )}
                 </button>
               </div>
               {errors.password && (
-                <p className="mt-1 text-xs text-red-400">
-                  {errors.password.message}
-                </p>
+                <p className="mt-1 text-xs text-error">{errors.password.message}</p>
               )}
             </div>
 
@@ -152,10 +161,20 @@ export const LoginPage = () => {
             {/* Submit */}
             <button
               type="submit"
-              className="mt-2 flex w-full items-center justify-center gap-2 rounded-lg bg-primary py-3 text-sm font-semibold text-on-primary shadow-[0_8px_24px_rgba(212,175,55,0.2)] transition hover:brightness-110"
+              disabled={loading}
+              className="mt-2 flex w-full items-center justify-center gap-2 rounded-lg bg-primary py-3 text-sm font-semibold text-on-primary shadow-[0_8px_24px_rgba(212,175,55,0.2)] transition hover:brightness-110 disabled:opacity-60"
             >
-              Log in
-              <ArrowRight className="h-4 w-4" strokeWidth={2} />
+              {loading ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Logging in...
+                </>
+              ) : (
+                <>
+                  Log in
+                  <ArrowRight className="h-4 w-4" strokeWidth={2} />
+                </>
+              )}
             </button>
           </form>
         </div>
