@@ -30,15 +30,21 @@ export const ExpenseCard = ({ expense }: { expense: Expense }) => {
 
       <div className="mt-3 flex items-center justify-between border-t border-outline-soft pt-3">
         <div className="text-xs text-soft-gray">
-          <p>{expense.date}</p>
-          <p>{expense.paymentMethod}</p>
+          <p>
+            {new Date(expense.date).toLocaleDateString("en-US", {
+              month: "short",
+              day: "numeric",
+              year: "numeric",
+            })}
+          </p>
+          <p>{expense.paymentMethod || "—"}</p>
         </div>
         <span className="font-[Newsreader] text-base font-medium tabular-nums text-on-surface">
-          {expense.amount}
+          Rs. {expense.amount.toLocaleString()}
         </span>
       </div>
 
-      {expense.hasReceipt && (
+      {expense.receipt && (
         <div className="mt-2 flex items-center gap-1 text-xs text-soft-gray">
           <Paperclip className="h-3.5 w-3.5" />
           Receipt available

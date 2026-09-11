@@ -11,7 +11,7 @@ import { NotFoundPage } from "./pages/NotFound/NotFoundPage";
 import { ServerErrorPage } from "./pages/ServerError/ServerErrorPage";
 import { RegisterPage } from "./pages/Register/RegisterPage";
 import { LoginPage } from "./pages/Login/LoginPage";
-import { ProtectedRoute } from "../components/layout/ProtectedRoutes";
+import { ProtectedRoute } from "@/components/layout/ProtectedRoutes";
 
 function App() {
   return (

@@ -17,7 +17,7 @@ export const ExpenseTable = ({ expenses }: { expenses: Expense[] }) => {
         </thead>
         <tbody>
           {expenses.map((expense) => (
-            <ExpenseRow key={expense.id} expense={expense} />
+            <ExpenseRow key={expense._id} expense={expense} />
           ))}
         </tbody>
       </table>

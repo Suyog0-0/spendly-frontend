@@ -20,17 +20,23 @@ export const ExpenseRow = ({ expense }: { expense: Expense }) => {
           </div>
         </div>
       </td>
-      <td className="px-3 py-3.5 text-sm text-soft-gray">{expense.date}</td>
       <td className="px-3 py-3.5 text-sm text-soft-gray">
-        {expense.paymentMethod}
+        {new Date(expense.date).toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+        })}
+      </td>
+      <td className="px-3 py-3.5 text-sm text-soft-gray">
+        {expense.paymentMethod || "—"}
       </td>
       <td className="px-3 py-3.5 text-right">
         <span className="font-[Newsreader] text-sm font-medium tabular-nums text-on-surface transition group-hover:border-l-2 group-hover:border-primary group-hover:pl-2">
-          {expense.amount}
+          Rs. {expense.amount.toLocaleString()}
         </span>
       </td>
       <td className="px-3 py-3.5">
-        {expense.hasReceipt ? (
+        {expense.receipt ? (
           <span className="inline-flex items-center gap-1 text-xs text-soft-gray">
             <Paperclip className="h-3.5 w-3.5" />
             Receipt
