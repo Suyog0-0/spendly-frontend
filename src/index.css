@@ -25,9 +25,44 @@
   --color-error: #ffb4ab;
 }
 
+body.light {
+  --color-obsidian: #f4f4f5;
+  --color-surface: #ffffff;
+  --color-surface-low: #fafafa;
+  --color-surface-container: #f4f4f5;
+  --color-surface-high: #e4e4e7;
+  --color-surface-bright: #d4d4d8;
+  --color-outline: #a1a1aa;
+  --color-outline-soft: #e4e4e7;
+
+  --color-on-surface: #18181b;
+  --color-soft-gray: #52525b;
+  --color-muted-gold: #b08d30;
+
+  --color-primary: #d4af37;
+  --color-primary-container: #f2ca50;
+  --color-on-primary: #ffffff;
+  --color-on-primary-container: #3c2f00;
+}
+
 body {
   margin: 0;
   background-color: var(--color-obsidian);
   color: var(--color-on-surface);
   font-family: var(--font-sans);
+}
+
+/* In light mode, heavy dark shadows look wrong — tone them down */
+body.light [class*="shadow-[0_4px_20px"] {
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08) !important;
+}
+body.light [class*="shadow-xl"] {
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.10) !important;
+}
+body.light [class*="shadow-[0_8px_24px"] {
+  box-shadow: 0 2px 8px rgba(212, 175, 55, 0.18) !important;
+}
+
+button, a, select, [role="button"] {
+  cursor: pointer;
 }

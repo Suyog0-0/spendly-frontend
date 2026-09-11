@@ -96,3 +96,19 @@ export const deleteExpense = async (id: string): Promise<void> => {
     throw new Error(err.message || "Failed to delete expense");
   }
 };
+
+export const changePassword = async (
+  currentPassword: string,
+  newPassword: string,
+): Promise<void> => {
+  const res = await fetch(`${API_URL}/api/auth/change-password`, {
+    method: "PUT",
+    headers: { ...authHeader(), "Content-Type": "application/json" },
+    body: JSON.stringify({ currentPassword, newPassword }),
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.message || "Failed to change password");
+  }
+};
