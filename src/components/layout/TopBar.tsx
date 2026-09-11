@@ -101,7 +101,7 @@ export const TopBar = ({ title }: { title: string }) => {
                         <span>Spent:</span> 
                         <span className="font-semibold text-error">Rs. {item.spent.toLocaleString()}</span> 
                         <span>/ {item.budget.toLocaleString()}</span>
-                        <TrendingUp className="h-3 w-3 text-error ml-1" title="Budget exceeded" />
+                        <TrendingUp className="h-3 w-3 text-error ml-1" />
                       </p>
                     </li>
                   ))

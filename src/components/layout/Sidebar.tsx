@@ -5,7 +5,6 @@ import {
   LayoutDashboard,
   Receipt,
   Wallet,
-  BarChart3,
   Settings,
   User,
   Plus,
