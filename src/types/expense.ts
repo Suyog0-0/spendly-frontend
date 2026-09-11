@@ -18,13 +18,13 @@ export interface ExpenseLineItem {
 }
 
 export interface Expense {
-  id: string;
+  _id: string;
   title: string;
   category: ExpenseCategory;
   date: string;
-  paymentMethod: PaymentMethod;
-  amount: string;
-  hasReceipt: boolean;
+  paymentMethod?: PaymentMethod;
+  amount: number;
   notes?: string;
   lineItems?: ExpenseLineItem[];
+  receipt?: string; // Cloudinary URL
 }
